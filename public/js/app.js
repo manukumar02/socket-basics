@@ -1,3 +1,7 @@
+var name = getQueryVariable('name') || 'Anonymous';
+var room = getQueryVariable('room');
+
+console.log(name, '  ', room);
 var socket = io();
 
 socket.on('connect', function() {
@@ -6,10 +10,11 @@ socket.on('connect', function() {
 
 socket.on('message', function(message) {
 	var momentTimestamp = moment.utc(message.timestamp);
+	var $message = $('.messages');
 	console.log('New Message: ');
 	console.log(message.text);
-
-	$('.messages').append('<p><strong>'+ momentTimestamp.local().format('h:mm a')+': </strong>' + message.text + '</P>')
+	$message.append('<p><strong>'+ message.name +' '+ momentTimestamp.local().format('h:mm a') +'</strong></p>')
+	$message.append('<p>' + message.text + '</P>')
 });
 
 var $form = $('#message-form');
@@ -20,6 +25,7 @@ $form.on('submit', function(event) {
 	var $message = $form.find('input[name="message"]');
 
 	socket.emit('message', {
+		name: name,
 		text: $message.val()
 	});
 
